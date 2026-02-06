@@ -21,17 +21,22 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); // Abre la app a pantalla completa
-
+        
         function send(text) {
-            // Esto fuerza a Telegram a abrir el chat actual con el texto pre-escrito
-            const botUsername = 'toledogusbot'; // Ejemplo: 'mi_bot' sin el @
-            window.location.href = `https://t.me/${botUsername}?text=${encodeURIComponent(text)}`;
+            // 1. Intentamos insertar el texto directamente en la caja (funciona en versiones recientes)
+            if (tg.version >= "7.10") {
+                tg.insertText(text);
+            } else {
+                // 2. Si la versión es vieja, usamos el switchInlineQuery modificado
+                tg.switchInlineQuery(text, ["users", "bots", "groups", "channels"]);
+            }
             
-            // Cerramos la Web App después de un breve instante para permitir el salto
+            // 3. Damos un margen de tiempo mayor antes de cerrar para que Telegram procese
             setTimeout(() => {
                 tg.close();
-            }, 100);
+            }, 300); 
         }
+        
     </script>
 </body>
 </html>
