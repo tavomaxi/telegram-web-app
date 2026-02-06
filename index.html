@@ -23,8 +23,14 @@
         tg.expand(); // Abre la app a pantalla completa
 
         function send(text) {
-            // Esto cierra la webapp y pone el texto en el chat listo para enviar
-            tg.switchInlineQuery(text); 
+            // Esto fuerza a Telegram a abrir el chat actual con el texto pre-escrito
+            const botUsername = 'toledogusbot'; // Ejemplo: 'mi_bot' sin el @
+            window.location.href = `https://t.me/${botUsername}?text=${encodeURIComponent(text)}`;
+            
+            // Cerramos la Web App después de un breve instante para permitir el salto
+            setTimeout(() => {
+                tg.close();
+            }, 100);
         }
     </script>
 </body>
