@@ -3,40 +3,46 @@
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 10px; }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 10px; text-align: center; }
         .command-btn { 
             display: block; width: 100%; padding: 15px; margin-bottom: 10px;
             background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
             border: none; border-radius: 8px; text-align: left; cursor: pointer;
-            font-size: 16px;
+            font-size: 16px; transition: 0.2s;
         }
+        .command-btn:active { opacity: 0.6; }
+        .hint { font-size: 12px; opacity: 0.7; margin-bottom: 15px; }
     </style>
 </head>
 <body>
     <h3>Mis Comandos</h3>
-    <button class="command-btn" onclick="send('/resumir')">/resumir</button>
-    <button class="command-btn" onclick="send('/explicar')">/explicar</button>
-    <button class="command-btn" onclick="send('Usar modelo DeepSeek')">Usar modelo DeepSeek</button>
+    <p class="hint">Toca un comando para copiarlo y luego pégalo en el chat.</p>
+    
+    <button class="command-btn" onclick="copyAndClose('/resumir')">/resumir</button>
+    <button class="command-btn" onclick="copyAndClose('/explicar')">/explicar</button>
+    <button class="command-btn" onclick="copyAndClose('Usar modelo DeepSeek')">Usar modelo DeepSeek</button>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Abre la app a pantalla completa
-        
-        function send(text) {
-            // 1. Intentamos insertar el texto directamente en la caja (funciona en versiones recientes)
-            if (tg.version >= "7.10") {
-                tg.insertText(text);
-            } else {
-                // 2. Si la versión es vieja, usamos el switchInlineQuery modificado
-                tg.switchInlineQuery(text, ["users", "bots", "groups", "channels"]);
-            }
+        tg.expand();
+
+        function copyAndClose(text) {
+            // Creamos un elemento temporal para copiar
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            // Mostramos un feedback visual rápido antes de cerrar
+            tg.HapticFeedback.notificationOccurred('success');
             
-            // 3. Damos un margen de tiempo mayor antes de cerrar para que Telegram procese
-            setTimeout(() => {
+            // Avisamos al usuario con un popup nativo (opcional, puedes quitarlo)
+            tg.showAlert("Copiado: " + text, () => {
                 tg.close();
-            }, 300); 
+            });
         }
-        
     </script>
 </body>
 </html>
