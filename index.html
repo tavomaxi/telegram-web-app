@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); padding: 20px; text-align: center; }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); padding: 20px; }
         .command-btn { 
             display: block; width: 100%; padding: 20px; margin-bottom: 15px;
             background: #0088cc; color: white; border: none; border-radius: 12px;
-            font-size: 18px; font-weight: bold;
+            font-size: 18px; font-weight: bold; cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <h2 style="text-align: center;">Comandos v3</h2>
     <button class="command-btn" onclick="run('/resumir')">/resumir</button>
     <button class="command-btn" onclick="run('/explicar')">/explicar</button>
 
     <script>
+        // Inicialización inmediata
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
 
         function run(text) {
+            // Intentar copiar al portapapeles de forma tradicional
             try {
-                // 1. Método moderno de copiado (Infallible en Mini Apps)
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(text);
-                }
-
-                // 2. Feedback táctil
-                tg.HapticFeedback.impactOccurred('medium');
-
-                // 3. Cerramos inmediatamente
-                tg.close();
-            } catch (e) {
-                // Si algo falla, cerramos igual para no bloquear la pantalla
-                tg.close();
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            } catch (err) {
+                console.error('Error al copiar', err);
             }
+
+            // FEEDBACK Y CIERRE FORZADO
+            tg.HapticFeedback.impactOccurred('heavy');
+            
+            // Método definitivo para enviar datos y cerrar (aunque el bot no los use)
+            // Esto obliga a Telegram a cerrar la ventana sí o sí
+            tg.sendData(text); 
+            
+            // Backup por si el de arriba falla en alguna versión
+            setTimeout(() => {
+                tg.close();
+            }, 100);
         }
     </script>
 </body>
