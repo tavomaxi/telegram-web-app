@@ -23,7 +23,8 @@
         tg.expand(); // Abre la app a pantalla completa
 
         function send(text) {
-            tg.sendData(text); // Envía el texto al bot y cierra la Web App
+            // Esto cierra la webapp y pone el texto en el chat listo para enviar
+            tg.switchInlineQuery(text); 
         }
     </script>
 </body>
